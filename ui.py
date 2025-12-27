@@ -42,7 +42,16 @@ class PlayerContainer(Vertical):
         padding: 0;
         margin: 0 1;
         content-align: center middle;
+        background: #555555;
     }
+
+    .card.revealed {
+        background: #2d74da;
+    }
+
+    .card.low { background: #1f5f2a; }
+    .card.mid { background: #7b6a1f; }
+    .card.high { background: #6b2323; }
     """
 
     def __init__(self, player_name: str, player_id: int):
@@ -71,7 +80,12 @@ class PlayerContainer(Vertical):
 
         
         name_widget = self.query_one(f"#pname-{self.player_id}", Static)
-        name_widget.update(f"{player.name}{'  ⟵' if active else ''}")
+        revealed_total = 0
+        for row in player.cards:
+            for val in row:
+                if isinstance(val, int):
+                    revealed_total += val
+        name_widget.update(f"{player.name} ({revealed_total}){'  ⟵' if active else ''}")
 
         
         for r in range(3):
@@ -79,10 +93,19 @@ class PlayerContainer(Vertical):
                 btn = self.query_one(f"#card_{self.player_id}-{r}-{c}", Button)
 
                 view_val = player.cards[r][c]
-                if view_val == "x":
-                    btn.label = "?"
-                else:
+                if isinstance(view_val, int):
                     btn.label = str(view_val)
+                    btn.remove_class("low", "mid", "high")
+                    if view_val <= 3:
+                        btn.add_class("low")
+                    elif view_val <= 9:
+                        btn.add_class("mid")
+                    else:
+                        btn.add_class("high")
+                    btn.add_class("revealed")
+                else:
+                    btn.label = "?"
+                    btn.remove_class("revealed", "low", "mid", "high")
 
 
 class Demo(App):
@@ -140,19 +163,18 @@ class Demo(App):
 
         with Horizontal(id="controls"):
             with Horizontal():
-                yield Button("Keep", id="keep", classes="btn")
-                yield Button("Discard", id="discard", classes="btn")
-                yield Button("Next", id="next", classes="btn")
-
-            yield Static("", classes="spacer")
-
-            with Horizontal():
                 with Vertical(classes="card_info"):
                     yield Static("Current Bin")
                     yield Button(f"{bin_card}", id="Bin")
                 with Vertical(classes="card_info"):
                     yield Static("From Deck")
                     yield Button("?", id="Draw")
+
+            yield Static("", classes="spacer")
+
+            with Horizontal():
+                yield Button("Keep", id="keep", classes="btn")
+                yield Button("Discard", id="discard", classes="btn")
 
         self.player_views = [PlayerContainer(p.name, i) for i, p in enumerate(self.players)]
 
@@ -241,11 +263,6 @@ class Demo(App):
                 self.refresh_ui()
             return
 
-        if bid == "next":
-            self._end_turn()
-            self.refresh_ui()
-            return
-
         # Card clicks
         if bid.startswith("card_"):
             # id format: card_<playerId>-<r>-<c>
@@ -263,7 +280,10 @@ class Demo(App):
             player = self.players[p_id]
 
             # Replace with pending (keep from deck)
-            if self.phase == "choose_target_replace" and self.pending_card is not None:
+            if self.pending_card is not None and self.phase in (
+                "choose_target_replace",
+                "choose_keep_or_discard",
+            ):
                 old = self._replace(player, r, c, self.pending_card)
                 self.deck.send_to_bin(old)
                 self._end_turn()
