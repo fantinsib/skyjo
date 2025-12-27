@@ -14,6 +14,8 @@ class PlayerNotFound(Exception):
 class DeckEmpty(Exception):
     pass
 
+class InvalidCard(Exception):
+    pass
 
 
 class Deck:
@@ -67,7 +69,7 @@ class Deck:
 class Player:
 
     def __init__(self, name):
-        self.cards = [["x", "x", "x", "x"] for _ in range(3)]
+        self.cards = [["?", "?", "?", "?"] for _ in range(3)]
         self._cards = [["o", "o", "o", "o"] for _ in range(3)]
         self.name = name
         self.is_a_bot = False
@@ -92,16 +94,15 @@ class Player:
     
     def change_card(self, row:int, col:int, new_card:int):
         prev_card = self._cards[int(row)][int(col)]
-        self.cards[int(row)][int(col)] = new_card
+        self._cards[int(row)][int(col)] = new_card
+        self._update_cards_view()
         return prev_card
     
     def show_cards(self):
-        print("\n")
-        for r in self.cards:
-            print(r)
+        return self.cards
             
     def _show_hidden_cards(self):
-        print(self._cards)
+        return(self._cards)
 
 
 
@@ -122,6 +123,13 @@ class Game:
                     card = self.deck.pop_random_card()
                     p._cards[row][col] = card
 
+    def _check_valid_card(self, card_val):
+        try: 
+            int(card_val)
+            return True
+        except:
+            raise InvalidCard(f"Erreur : la carte {card_val} n'est pas valide")
+
             
     def _check_legality(self, move, type):
         cmd = command_mapping.get(move, None)
@@ -141,6 +149,7 @@ class Game:
             for row in p.cards:
                 player_count += sum([i for i in row if isinstance(i, int)])
             count[p.name] = player_count
+        return count
 
     def fetch_bin(self):
         return self.deck.fetch_bin()
@@ -152,13 +161,12 @@ class Game:
 
     def draw_from_deck(self, p: Player):
         drawn_card = self.deck.pop_random_card()
-        print(drawn_card)
+        
         accept = ''
         while accept not in ["Y", "y", "N", "n"]:
             accept = input("Keep ? (Y/n)")
 
         if accept.lower() == "y":
-            print("Replace :")
             x = input("Row : ")
             y = input("Column : ")
             prev_card = p.change_card(x, y, drawn_card)
