@@ -133,8 +133,8 @@ class Demo(App):
     def __init__(self):
         super().__init__()
 
-        # Model
-        self.players = [Player("A"), Player("B"), Player("C")]
+        
+        self.players = [Player("A"), Player("B"), Player("C"), Player("D")]
         self.deck = Deck()
         self.game = Game(self.players, self.deck)
 
@@ -144,17 +144,13 @@ class Demo(App):
         except Exception:
             pass
 
-        # UI / turn state
+      
         self.current_player_idx = 0
         self.phase = "choose_draw"  
         self.pending_card: int | None = None
 
-        # Views
         self.player_views: list[PlayerContainer] = []
 
-    # ----------------------------
-    # UI layout
-    # ----------------------------
     def compose(self) -> ComposeResult:
         bin_card = self.game.fetch_bin()
 
@@ -208,9 +204,8 @@ class Demo(App):
         self.phase = "choose_draw"
         self.current_player_idx = (self.current_player_idx + 1) % len(self.players)
 
-    # ----------------------------
-    # BINDINGS actions
-    # ----------------------------
+
+
     def action_draw_deck(self) -> None:
         if self.phase != "choose_draw":
             return
@@ -233,9 +228,6 @@ class Demo(App):
         self.phase = "choose_target_bin_replace"
         self.refresh_ui()
 
-    # ----------------------------
-    # Click handling
-    # ----------------------------
     def on_button_pressed(self, event: Button.Pressed) -> None:
         bid = event.button.id or ""
 
@@ -247,7 +239,6 @@ class Demo(App):
             self.action_draw_bin()
             return
 
-        # Control buttons
         if bid == "keep":
             if self.phase == "choose_keep_or_discard" and self.pending_card is not None:
                 self.phase = "choose_target_replace"
@@ -256,14 +247,12 @@ class Demo(App):
 
         if bid == "discard":
             if self.phase == "choose_keep_or_discard" and self.pending_card is not None:
-                # Discard pending to bin immediately, then choose a card to reveal
                 self.deck.send_to_bin(self.pending_card)
                 self.pending_card = None
                 self.phase = "choose_target_reveal"
                 self.refresh_ui()
             return
 
-        # Card clicks
         if bid.startswith("card_"):
             # id format: card_<playerId>-<r>-<c>
             try:
@@ -273,13 +262,11 @@ class Demo(App):
             except Exception:
                 return
 
-            # Only allow clicking current player's cards
             if p_id != self.current_player_idx:
                 return
 
             player = self.players[p_id]
 
-            # Replace with pending (keep from deck)
             if self.pending_card is not None and self.phase in (
                 "choose_target_replace",
                 "choose_keep_or_discard",
@@ -290,25 +277,20 @@ class Demo(App):
                 self.refresh_ui()
                 return
 
-            # Reveal a card after discard
             if self.phase == "choose_target_reveal":
                 self._reveal(player, r, c)
                 self._end_turn()
                 self.refresh_ui()
                 return
-
-            # Take bin card and replace directly
+            
             if self.phase == "choose_target_bin_replace" and self.pending_card is not None:
-                # Taking the bin card is equivalent to replacing the bin top with the old card
                 old = self._replace(player, r, c, self.pending_card)
                 self.deck.send_to_bin(old)
                 self._end_turn()
                 self.refresh_ui()
                 return
 
-    # ----------------------------
-    # UI refresh
-    # ----------------------------
+
     def refresh_ui(self) -> None:
         try:
             bin_card = self.game.fetch_bin()
