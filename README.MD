@@ -5,7 +5,7 @@ To test it :
 ```bash
 git clone https://github.com/fantinsib/skyjo.git
 cd skyjo
-python ui.py
+python main.py
 ```
 
 ## Example

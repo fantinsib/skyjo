@@ -1,17 +1,14 @@
-from skyjo_main import Deck, Player, Game
-from game_loop import GameLoop
-game_is_on = True
+import os
+import sys
 
-A = Player("A")
-B = Player("B")
-C = Player("C")
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 
-deck = Deck()
-
-players = [A, B, C]
-
-gameloop = GameLoop(Game(players, deck))
-gameloop.start()
+from skyjo.core.deck import Deck
+from skyjo.core.game import Game
+from skyjo.core.player import Player
+from skyjo.ui.playercontainer import PlayerContainer
+from skyjo.ui.app import Skyjo
 
 
-
+if __name__ == "__main__":
+    Skyjo().run()
