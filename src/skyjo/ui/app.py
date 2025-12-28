@@ -38,7 +38,7 @@ class Skyjo(App):
         super().__init__()
 
         
-        self.players = [Player("A"), Player("B"), Player("C"), Player("D")]
+        self.players = [Player("A"), Player("B")]
         self.deck = Deck()
         self.game = Game(self.players, self.deck)
 

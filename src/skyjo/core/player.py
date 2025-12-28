@@ -20,9 +20,21 @@ class Player:
         return f"Player {self.name}"
     
     def _update_cards_view(self):
-        #Update the mapping of revealed cards
+        #Checks if a row or a col contains same value
+        # and update the view of revealed cards
+        for i,row in enumerate(self.cards):
+            if (all(x == row[0] for x in row)) and (isinstance(row[0], int)) :
+                self._cards[i] = ["x", "x", "x", "x"]
+        
+        for c in range(len(self.cards[0])):
+            col_vals = [self.cards[r][c] for r in range(len(self.cards))]
+            if (all(x == col_vals[0] for x in col_vals)) and (isinstance(col_vals[0], int)):
+                for r in range(len(self.cards)):
+                    self._cards[r][c] = "x"
+            
         for coords in self._revealed_cards_map:
             self.cards[int(coords[0])][int(coords[1])] = self._cards[int(coords[0])][int(coords[1])]
+        
 
     def reveal_card(self,row , col):
         #appends a new card to the mapping of revealed cards + update the view
@@ -42,6 +54,8 @@ class Player:
             
     def _show_hidden_cards(self):
         return(self._cards)
+    
+
 
 
 
@@ -55,7 +69,6 @@ class Player:
     
 
         
-
 
 
 

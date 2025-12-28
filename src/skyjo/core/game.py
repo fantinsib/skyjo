@@ -9,6 +9,7 @@ command_mapping = {
         "rc": "replace_card",
         "dc": "discover_card"
     }
+
 class Game:
     def __init__(self, players : list[Player], deck):
         self.players = players
@@ -31,7 +32,6 @@ class Game:
             return True
         except:
             raise InvalidCard(f"Erreur : la carte {card_val} n'est pas valide")
-
             
     def _check_legality(self, move, type):
         cmd = command_mapping.get(move, None)
@@ -52,6 +52,12 @@ class Game:
                 player_count += sum([i for i in row if isinstance(i, int)])
             count[p.name] = player_count
         return count
+    
+    def check_player_count(self, p):
+        player_count = 0
+        for row in p.cards:
+            player_count += sum([i for i in row if isinstance(i, int)])
+        return player_count
 
     def fetch_bin(self):
         return self.deck.fetch_bin()
@@ -89,4 +95,6 @@ class Game:
         y = input("Column : ")
         prev_card = p.change_card(x, y, card)
         self.deck.send_to_bin(prev_card)
+
+    
 
