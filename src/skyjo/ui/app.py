@@ -42,6 +42,7 @@ class Skyjo(App):
         self.deck = Deck()
         self.game = Game(self.players, self.deck)
 
+        '''
         ################# DEBUG #####################
         self.players[0]._cards = [
             [1,2,3,4],
@@ -50,7 +51,7 @@ class Skyjo(App):
             [1,2,3,4]
         ]
         ##############################################
-        
+        '''
 
         try:
             if not isinstance(self.game.fetch_bin(), int) and self.deck.cards_left() > 0:
