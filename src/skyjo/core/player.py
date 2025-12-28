@@ -19,6 +19,13 @@ class Player:
     def __repr__(self):
         return f"Player {self.name}"
     
+    def reveal_card(self,row , col):
+        #appends a new card to the mapping of revealed cards + update the view
+        if (int(row), int(col)) not in self._revealed_cards_map:
+            self._revealed_cards_map.append((int(row), int(col)))
+        self.update_cards_view()
+        return self.cards[int(row)][int(col)]
+    
     def update_cards_view(self):
         #Checks if a row or a col contains same value
         # and update the view of revealed cards
@@ -38,15 +45,6 @@ class Player:
 
         for coords in self._revealed_cards_map:
             self.cards[int(coords[0])][int(coords[1])] = self._cards[int(coords[0])][int(coords[1])]
-    
-            
-
-    def reveal_card(self,row , col):
-        #appends a new card to the mapping of revealed cards + update the view
-        if (int(row), int(col)) not in self._revealed_cards_map:
-            self._revealed_cards_map.append((int(row), int(col)))
-        self.update_cards_view()
-        return self.cards[int(row)][int(col)]
     
     def change_card(self, row:int, col:int, new_card:int):
         prev_card = self._cards[int(row)][int(col)]

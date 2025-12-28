@@ -6,11 +6,9 @@ from skyjo.core.game import Game
 from skyjo.core.player import Player
 from skyjo.ui.playercontainer import PlayerContainer
 
-
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.widgets import Button, Footer, Header, Static
-
 
 class Skyjo(App):
     TITLE = "Skyjo"
@@ -30,14 +28,12 @@ class Skyjo(App):
     BINDINGS = [
         ("q", "quit", "Quit"),
         ("d", "draw_deck", "Deck"),
-        ("b", "draw_bin", "Bin"),
+        ("b", "draw_bin", "Bin")
     ]
-
 
     def __init__(self):
         super().__init__()
 
-        
         self.players = [Player("A"), Player("B")]
         self.deck = Deck()
         self.game = Game(self.players, self.deck)
@@ -52,14 +48,16 @@ class Skyjo(App):
         ]
         ##############################################
         '''
+<<<<<<< HEAD
 
+=======
+>>>>>>> b803514 (Bug Corrected)
         try:
             if not isinstance(self.game.fetch_bin(), int) and self.deck.cards_left() > 0:
                 self.deck.send_to_bin(self.deck.pop_random_card())
         except Exception:
             pass
-
-      
+ 
         self.current_player_idx = 0
         self.phase = "choose_draw"  
         self.pending_card: int | None = None
@@ -117,16 +115,14 @@ class Skyjo(App):
         self.phase = "choose_draw"
         self.current_player_idx = (self.current_player_idx + 1) % len(self.players)
 
-
-
     def action_draw_deck(self) -> None:
         if self.phase != "choose_draw":
             return
         if self.deck.cards_left() <= 0:
             return
-
+        #Draw card from deck :
         self.pending_card = self.deck.pop_random_card()
-        self.phase = "choose_keep_or_discard"
+        self.phase = "choose_keep_or_discard" 
         self.refresh_ui()
 
     def action_draw_bin(self) -> None:
@@ -181,18 +177,19 @@ class Skyjo(App):
 
             player = self.players[p_id]
 
-
             if self.pending_card is not None and self.phase in (
                 "choose_target_replace",
                 "choose_keep_or_discard",
             ) :
                 old = self._replace(player, r, c, self.pending_card)
                 self.deck.send_to_bin(old)
+                
                 self._end_turn()
                 self.refresh_ui()
                 return
 
             if self.phase == "choose_target_reveal":
+                
                 player.reveal_card(r,c)
                 self._end_turn()
                 self.refresh_ui()
@@ -202,11 +199,13 @@ class Skyjo(App):
                 old = self._replace(player, r, c, self.pending_card)
                 self.deck.send_to_bin(old)
                 self._end_turn()
+                
                 self.refresh_ui()
                 return
 
 
     def refresh_ui(self) -> None:
+        self.game.update_all_views()
         try:
             bin_card = self.game.fetch_bin()
         except Exception:
@@ -238,5 +237,4 @@ class Skyjo(App):
 
         for i, view in enumerate(self.player_views):
             view.update_from_player(self.players[i], active=(i == self.current_player_idx))
-
 

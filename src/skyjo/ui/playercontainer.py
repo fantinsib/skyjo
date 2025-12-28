@@ -91,7 +91,6 @@ class PlayerContainer(Vertical):
                     revealed_total += val
         name_widget.update(f"{player.name} ({revealed_total}){'  ⟵' if active else ''}")
 
-        
         for r in range(3):
             for c in range(4):
                 btn = self.query_one(f"#card_{self.player_id}-{r}-{c}", Button)

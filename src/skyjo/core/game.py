@@ -96,5 +96,10 @@ class Game:
         prev_card = p.change_card(x, y, card)
         self.deck.send_to_bin(prev_card)
 
+
+    def update_all_views(self):
+        for p in self.players:
+            p.update_cards_view()
+        
     
 

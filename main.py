@@ -9,6 +9,5 @@ from skyjo.core.player import Player
 from skyjo.ui.playercontainer import PlayerContainer
 from skyjo.ui.app import Skyjo
 
-
 if __name__ == "__main__":
     Skyjo().run()
