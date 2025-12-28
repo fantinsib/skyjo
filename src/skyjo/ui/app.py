@@ -42,6 +42,16 @@ class Skyjo(App):
         self.deck = Deck()
         self.game = Game(self.players, self.deck)
 
+        ################# DEBUG #####################
+        self.players[0]._cards = [
+            [1,2,3,4],
+            [1,2,3,4],
+            [1,2,3,4],
+            [1,2,3,4]
+        ]
+        ##############################################
+        
+
         try:
             if not isinstance(self.game.fetch_bin(), int) and self.deck.cards_left() > 0:
                 self.deck.send_to_bin(self.deck.pop_random_card())
@@ -68,7 +78,7 @@ class Skyjo(App):
                     yield Button(f"{bin_card}", id="Bin")
                 with Vertical(classes="card_info"):
                     yield Static("From Deck")
-                    yield Button("?", id="Draw")
+                    yield Button("Draw card", id="Draw")
 
             yield Static("", classes="spacer")
 
@@ -91,9 +101,7 @@ class Skyjo(App):
         self.refresh_ui()
 
     def _reveal(self, player: Player, r: int, c: int) -> None:
-        if (r, c) not in player._revealed_cards_map:
-            player._revealed_cards_map.append((r, c))
-        player.cards[r][c] = player._cards[r][c]
+        player.reveal_card(r,c)
 
     def _replace(self, player: Player, r: int, c: int, new_card: int) -> int:
         old = player._cards[r][c]
@@ -160,21 +168,23 @@ class Skyjo(App):
         if bid.startswith("card_"):
             # id format: card_<playerId>-<r>-<c>
             try:
+                #fetching the p_id and loc of the clicked card
                 payload = bid.removeprefix("card_")
                 p_id_str, r_str, c_str = payload.split("-")
                 p_id, r, c = int(p_id_str), int(r_str), int(c_str)
             except Exception:
                 return
 
-            if p_id != self.current_player_idx:
+            if p_id != self.current_player_idx: #making sure clicked card belongs to current player
                 return
 
             player = self.players[p_id]
 
+
             if self.pending_card is not None and self.phase in (
                 "choose_target_replace",
                 "choose_keep_or_discard",
-            ):
+            ) :
                 old = self._replace(player, r, c, self.pending_card)
                 self.deck.send_to_bin(old)
                 self._end_turn()
@@ -182,7 +192,7 @@ class Skyjo(App):
                 return
 
             if self.phase == "choose_target_reveal":
-                self._reveal(player, r, c)
+                player.reveal_card(r,c)
                 self._end_turn()
                 self.refresh_ui()
                 return

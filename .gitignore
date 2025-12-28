@@ -5,3 +5,5 @@ venv/
 .env
 textual_demo.py
 skyjo.ipynb
+launch.json
+.DS_Store

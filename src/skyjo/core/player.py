@@ -19,34 +19,39 @@ class Player:
     def __repr__(self):
         return f"Player {self.name}"
     
-    def _update_cards_view(self):
+    def update_cards_view(self):
         #Checks if a row or a col contains same value
         # and update the view of revealed cards
+
+        for coords in self._revealed_cards_map:
+            self.cards[int(coords[0])][int(coords[1])] = self._cards[int(coords[0])][int(coords[1])]
+        
         for i,row in enumerate(self.cards):
             if (all(x == row[0] for x in row)) and (isinstance(row[0], int)) :
-                self._cards[i] = ["x", "x", "x", "x"]
+                self._cards[i] = ["X", "X", "X", "X"]
         
         for c in range(len(self.cards[0])):
             col_vals = [self.cards[r][c] for r in range(len(self.cards))]
             if (all(x == col_vals[0] for x in col_vals)) and (isinstance(col_vals[0], int)):
                 for r in range(len(self.cards)):
-                    self._cards[r][c] = "x"
-            
+                    self._cards[r][c] = "X"
+
         for coords in self._revealed_cards_map:
             self.cards[int(coords[0])][int(coords[1])] = self._cards[int(coords[0])][int(coords[1])]
-        
+    
+            
 
     def reveal_card(self,row , col):
         #appends a new card to the mapping of revealed cards + update the view
-        self._revealed_cards_map.append((int(row), int(col)))
-        self._update_cards_view()
-        self.show_cards()
+        if (int(row), int(col)) not in self._revealed_cards_map:
+            self._revealed_cards_map.append((int(row), int(col)))
+        self.update_cards_view()
         return self.cards[int(row)][int(col)]
     
     def change_card(self, row:int, col:int, new_card:int):
         prev_card = self._cards[int(row)][int(col)]
         self._cards[int(row)][int(col)] = new_card
-        self._update_cards_view()
+        self.update_cards_view()
         return prev_card
     
     def show_cards(self):

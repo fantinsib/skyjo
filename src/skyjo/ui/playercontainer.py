@@ -55,6 +55,7 @@ class PlayerContainer(Vertical):
     .card.low { background: #1f5f2a; }
     .card.mid { background: #7b6a1f; }
     .card.high { background: #6b2323; }
+    .card.completed { background: #000000;}
     """
 
     def __init__(self, player_name: str, player_id: int):
@@ -96,15 +97,17 @@ class PlayerContainer(Vertical):
                 btn = self.query_one(f"#card_{self.player_id}-{r}-{c}", Button)
 
                 view_val = player.cards[r][c]
-                if isinstance(view_val, int):
+                if isinstance(view_val, int) or (view_val=="X"):
                     btn.label = str(view_val)
                     btn.remove_class("low", "mid", "high")
-                    if view_val <= 3:
+                    if btn.label in ["-2","-1","0","1","2","3"]:
                         btn.add_class("low")
-                    elif view_val <= 9:
+                    elif btn.label in ['4','5',"6",'7',"8","9"]:
                         btn.add_class("mid")
-                    else:
+                    elif btn.label in ['10','11',"12"]:
                         btn.add_class("high")
+                    elif btn.label == "X":
+                        btn.add_class("completed")
                     btn.add_class("revealed")
                 else:
                     btn.label = "?"
